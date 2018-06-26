@@ -133,7 +133,7 @@ presubmits:
         - "--build=bazel"
         - "--acsengine-admin-password=Passw0rdAdmin"
         - "--acsengine-admin-username=azureuser"
-        - "--acsengine-download-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/acs-engine-dirty.tar.gz"
+        - "--acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.18.9/acs-engine-v0.18.9-linux-amd64.tar.gz"
         - "--acsengine-orchestratorRelease=1.11"
         - "--acsengine-creds=$AZURE_CREDENTIALS"
         - "--acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE"
