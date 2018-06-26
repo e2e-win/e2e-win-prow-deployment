@@ -1,0 +1,245 @@
+log_level: debug
+
+sinker:
+  resync_period: 3m
+  max_prowjob_age: 10m
+  max_pod_age: 10m
+
+presets:
+# credential presets
+- labels:
+    preset-service-account: "true"
+  env:
+  - name: GOOGLE_APPLICATION_CREDENTIALS
+    value: /etc/service-account/service-account.json
+  volumes:
+  - name: service
+    secret:
+      secretName: service-account
+  volumeMounts:
+  - name: service
+    mountPath: /etc/service-account
+    readOnly: true
+- labels:
+    preset-azure-creds: "true"
+  env:
+  - name: AZURE_CREDENTIALS
+    value: /etc/azure-cred/credentials
+  volumes:
+  - name: azure-cred
+    secret:
+      secretName: azure-cred
+  volumeMounts:
+  - name: azure-cred
+    mountPath: /etc/azure-cred
+    readOnly: true
+- labels:
+    preset-azure-ssh: "true"
+  env:
+  - name: AZURE_SSH_PUBLIC_KEY_FILE
+    value: /etc/azure-ssh/azure-ssh-pub
+  - name: DOCKER_USER
+    value: atuvenie
+  - name: DOCKER_PASS
+    value: YVz-Hy5-C3z-Rgx
+  - name: CLOUD_CONFIG
+    value: random
+  - name: AZ_STORAGE_CONTAINER_NAME
+    value: mystoragecontainer
+  - name: REGISTRY
+    value: atuvenie
+  - name: WIN_BUILD
+    value: https://raw.githubusercontent.com/adelina-t/acs-engine/change_gen_script_for_e2e/scripts/build-windows-k8s.sh
+  volumes:
+  - name: azure-ssh
+    secret:
+      secretName: azure-ssh
+  volumeMounts:
+  - name: azure-ssh
+    mountPath: /etc/azure-ssh
+    readOnly: true
+      
+presubmits:
+  e2e-win/kubernetes:
+  - name: ci-kubernetes-build-stable1
+    agent: kubernetes
+    context: ci-kubernetes-build-stable1
+    always_run: true
+    rerun_command: "/test ci-kubernetes-build-stable1"
+    trigger: "(?m)^/test( all| ci-kubernetes-build-stable1),?(\\s+|$)"
+    labels:
+      preset-service-account: "true"
+    spec:
+      containers:
+      - image: atuvenie/kubekins-e2e:1.0-master
+        args:
+        - "--repo=k8s.io/kubernetes=release-1.10"
+        - "--repo=k8s.io/release"
+        - "--root=/go/src"
+        - "--timeout=120"
+        - "--"
+        - "--allow-dup"
+        - "--extra-publish-file=k8s-stable1"
+        - "--hyperkube"
+        - "--registry=atuvenie"
+        env:
+        - name: DOCKER_IN_DOCKER_ENABLED
+          value: "true"
+          # docker-in-docker needs privileged mode
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: docker-graph
+          mountPath: /docker-graph
+#        resources:
+#          requests:
+#            cpu: 2
+#            memory: "3Gi"
+      volumes:
+      - name: docker-graph
+        emptyDir: {}
+
+  - name: pull-kubernetes-e2e-win
+    agent: kubernetes
+    context: pull-kubernetes-e2e-win
+    always_run: false
+    rerun_command: "/test pull-kubernetes-e2e-win"
+    trigger: "(?m)^/test( all| pull-kubernetes-e2e-win),?(\\s+|$)"
+    skip_branches:
+    - release-1.10 # different bazel version
+    - release-1.9 # need to cherry pick back https://github.com/kubernetes/kubernetes/pull/59251, possibly others
+    - release-1.8 # different set of targets
+    labels:
+      preset-service-account: "true"
+      preset-azure-creds: "true"
+      preset-azure-ssh: "true"
+    spec:
+      containers:
+      - image: atuvenie/kubekins-e2e:1.0-master
+        args:
+        - "--job=$(JOB_NAME)"
+        - "--repo=github.com/e2e-win/$(REPO_NAME)=$(PULL_REFS)"
+        - "--root=/go/src"
+        - "--service-account=/etc/service-account/service-account.json"
+        - "--upload=gs://win-e2e-test/pr-logs"
+        - "--timeout=300"
+        - "--scenario=kubernetes_e2e"
+        - "--" # end bootstrap args, scenario args below
+        - "--deployment=acsengine"
+        - "--provider=azure"
+        - "--test=false"
+        - "--up=true"
+        - "--down=false"
+        - "--build=bazel"
+        - "--acsengine-admin-password=Passw0rdAdmin"
+        - "--acsengine-admin-username=azureuser"
+        - "--acsengine-download-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/acs-engine-dirty.tar.gz"
+        - "--acsengine-orchestratorRelease=1.11"
+        - "--acsengine-creds=$AZURE_CREDENTIALS"
+        - "--acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE"
+        - "--acsengine-winZipBuildScript=$WIN_BUILD"
+        - "--acsengine-location=eastus"
+        - "--test_args=--ginkgo.dryRun=true --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.provide.DNS.for.the.cluster..\\[Conformance\\]|should.call.prestop.when.killing.a.pod..\\[Conformance\\]|should.enable.privileged.commands|should.support.remote.command.execution.over.websockets.\\[NodeConformance\\]|should.test.kubelet.managed./etc/hosts.file.\\[NodeConformance\\].\\[Conformance\\]|should.invoke.init.containers.on.a.RestartAlways.pod|should.create.and.stop.a.working.application..\\[Conformance\\]|should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|HostPath|EmptyDir.volumes"
+        env:
+        - name: DOCKER_IN_DOCKER_ENABLED
+          value: "true"
+          # docker-in-docker needs privileged mode
+        volumeMounts:
+        - name: docker-graph
+          mountPath: /docker-graph
+        securityContext:
+          privileged: true
+      volumes:
+        - name: docker-graph
+          emptyDir: {}
+
+  - name: pull-kubernetes-e2e-win-fast
+    agent: kubernetes
+    context: pull-kubernetes-e2e-win-fast
+    always_run: false
+    rerun_command: "/test pull-kubernetes-e2e-win-fast"
+    trigger: "(?m)^/test( all| pull-kubernetes-e2e-win-fast),?(\\s+|$)"
+    skip_branches:
+    - release-1.10 # different bazel version
+    - release-1.9 # need to cherry pick back https://github.com/kubernetes/kubernetes/pull/59251, possibly others
+    - release-1.8 # different set of targets
+    labels:
+      preset-service-account: "true"
+      preset-azure-creds: "true"
+      preset-azure-ssh: "true"
+    spec:
+      containers:
+      - image: atuvenie/kubekins-e2e:1.0-master
+        args:
+        - "--job=$(JOB_NAME)"
+        - "--repo=github.com/e2e-win/$(REPO_NAME)=$(PULL_REFS)"
+        - "--root=/go/src"
+        - "--service-account=/etc/service-account/service-account.json"
+        - "--upload=gs://win-e2e-test/pr-logs"
+        - "--timeout=300"
+        - "--scenario=kubernetes_e2e"
+        - "--" # end bootstrap args, scenario args below
+        - "--deployment=acsengine"
+        - "--provider=azure"
+        - "--test=true"
+        - "--up=true"
+        - "--down=false"
+        - "--extract=ci/latest"
+        - "--acsengine-admin-password=Passw0rdAdmin"
+        - "--acsengine-admin-username=azureuser"
+        - "--acsengine-download-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/acs-engine-dirty.tar.gz"
+        - "--acsengine-creds=$AZURE_CREDENTIALS"
+        - "--acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE"
+        - "--acsengine-winZipBuildScript=$WIN_BUILD"
+        - "--acsengine-location=westus2"
+        - "--acsengine-orchestratorRelease=1.10"
+        - "--acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1001180302233571328.zip"
+        - "--acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1001180302233571328"
+        - "--test_args=--ginkgo.dryRun=true --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.provide.DNS.for.the.cluster..\\[Conformance\\]|should.call.prestop.when.killing.a.pod..\\[Conformance\\]|should.enable.privileged.commands|should.support.remote.command.execution.over.websockets.\\[NodeConformance\\]|should.test.kubelet.managed./etc/hosts.file.\\[NodeConformance\\].\\[Conformance\\]|should.invoke.init.containers.on.a.RestartAlways.pod|should.create.and.stop.a.working.application..\\[Conformance\\]|should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|HostPath|EmptyDir.volumes"
+        env:
+        - name: DOCKER_IN_DOCKER_ENABLED
+          value: "true"
+          # docker-in-docker needs privileged mode
+        volumeMounts:
+        - name: docker-graph
+          mountPath: /docker-graph
+        securityContext:
+          privileged: true
+      volumes:
+        - name: docker-graph
+          emptyDir: {}
+
+  - name: test-acs-engine-stable
+    agent: kubernetes
+    context: test-acs-engine-stable
+    always_run: false
+    rerun_command: "/test test-acs-engine-stable"
+    trigger: "(?m)^/test( all| test-acs-engine-stable),?(\\s+|$)"
+    labels:
+      preset-azure-creds: "true"
+      preset-azure-ssh: "true"
+    spec:
+      containers:
+        - image: edwardro22/acs-engine-test
+          env:
+          - name: AZ_LOCATION
+            value: westus2
+          - name: AZ_HYPERKUBE
+            value: atuvenie/hyperkube-amd64:1001406920495468544
+          - name: AZ_ZIPFILE
+            value: http://k8szipstorage.blob.core.windows.net/mystoragecontainer/v1.11.3.zip
+          - name: AZ_ORCHESTRATOR
+            value: "1.11"
+
+periodics:
+ - interval: 24h
+   agent: kubernetes
+   name: kubetest-build-job
+   spec:
+     containers:
+     - image: e2eteam/kubetest-build
+       env:
+       - name: AZ_STORAGE_KEY
+         value: ""
+       - name: AZ_STORAGE_ACCOUNT
+         value: ""
