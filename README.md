@@ -7,7 +7,9 @@
 
 #### http://k8s-win-prow.eastus.cloudapp.azure.com
 
-### Running E2E tests
+### PRs to this repo will automatically start e2e conformance tests
+
+### Running E2E tests manually
 
 1. Using kubetest to create new cluster on Azure via acs-engine
 
