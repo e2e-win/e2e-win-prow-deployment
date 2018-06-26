@@ -50,13 +50,21 @@ presets:
     value: atuvenie
   - name: WIN_BUILD
     value: https://raw.githubusercontent.com/adelina-t/acs-engine/change_gen_script_for_e2e/scripts/build-windows-k8s.sh
+  - name: KUBE_TEST_REPO_LIST
+    value: /etc/repo-list
   volumes:
   - name: azure-ssh
     secret:
       secretName: azure-ssh
+  - name: repo-list
+    secret:
+      secretName: repo-list
   volumeMounts:
   - name: azure-ssh
     mountPath: /etc/azure-ssh
+    readOnly: true
+  - name: repo-list
+    mountPath: /etc/repo-list
     readOnly: true
       
 presubmits:
@@ -64,7 +72,7 @@ presubmits:
   - name: ci-kubernetes-build-stable1
     agent: kubernetes
     context: ci-kubernetes-build-stable1
-    always_run: true
+    always_run: false
     rerun_command: "/test ci-kubernetes-build-stable1"
     trigger: "(?m)^/test( all| ci-kubernetes-build-stable1),?(\\s+|$)"
     labels:
@@ -240,6 +248,6 @@ periodics:
      - image: e2eteam/kubetest-build
        env:
        - name: AZ_STORAGE_KEY
-         value: ""
+         value: "a+KJRV1/Sksq6t6Bny7hY2pOtu67I7dG8Z/30BHwdCrsI6dpERwgEsvo/GjkFuNiS3igE8jM8AUlE+mCghYdjg=="
        - name: AZ_STORAGE_ACCOUNT
-         value: ""
+         value: "k8swin"
