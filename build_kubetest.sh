@@ -4,7 +4,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-PLATFORM="linux"
+PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 KUBETEST_REPO="http://github.com/adelina-t/test-infra"
 KUBETEST_BRANCH="azure_provider"
@@ -25,6 +25,7 @@ echo "Building kubetest"
 bazel build //kubetest
 
 function upload_blob() {
+
 	az storage blob upload --container-name $1 --name $2 --file $BAZEL_OUTPUT --account-name $AZ_STORAGE_ACCOUNT --account-key $AZ_STORAGE_KEY
 
 }
