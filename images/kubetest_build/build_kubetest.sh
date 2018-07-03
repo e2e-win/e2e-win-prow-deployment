@@ -6,7 +6,7 @@ set -o pipefail
 
 PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
 
-KUBETEST_REPO="http://github.com/adelina-t/test-infra"
+KUBETEST_REPO="http://github.com/e2e-win/test-infra"
 KUBETEST_BRANCH="azure_provider"
 
 TEST_INFRA_DIR="$HOME/test-infra"

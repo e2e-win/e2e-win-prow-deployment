@@ -48,8 +48,5 @@ RUN INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"; \
 
 ENV HOME /root
 
-RUN git clone http://github.com/e2e-win/e2e-win-prow-deployment $HOME/e2e-win-prow-deployment
-
-WORKDIR $HOME/e2e-win-prow-deployment
-
+COPY ./build_kubetest.sh .
 ENTRYPOINT ["./build_kubetest.sh"]
