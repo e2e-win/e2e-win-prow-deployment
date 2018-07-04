@@ -35,10 +35,12 @@ acs-engine version
 
 KUBETEST_URL="https://k8swin.blob.core.windows.net/k8s-windows/testing/kubetest/kubetest_latest/kubetest"
 wget https://k8swin.blob.core.windows.net/k8s-windows/testing/kubetest/kubetest_latest/kubetest -P $HOME
+KUBETEST=${HOME}/kubetest
+chmod +x ${KUBETEST}
 
 # Clone kubernetes
 
-KUBE_REPO={"http://github.com/e2e-win/kubernetes"}
+KUBE_REPO=${KUBE_REPO:-"http://github.com/e2e-win/kubernetes"}
 KUBE_DIR=${GOPATH}/src/k8s.io/kubernetes
 mkdir -p $KUBE_DIR
 
@@ -49,4 +51,4 @@ cd $KUBE_DIR
 # Note environment variables are set by the prow job
 echo "Running kubetest"
 
-kubetest --deployment=acsengine --provider=azure --test=true --up=true --down=false --build=bazel --ginkgo-parallel=10 --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args=--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.provide.DNS.for.the.cluster..\\[Conformance\\]|should.call.prestop.when.killing.a.pod..\\[Conformance\\]|should.enable.privileged.commands|should.support.remote.command.execution.over.websockets.\\[NodeConformance\\]|should.test.kubelet.managed./etc/hosts.file.\\[NodeConformance\\].\\[Conformance\\]|should.invoke.init.containers.on.a.RestartAlways.pod|should.create.and.stop.a.working.application..\\[Conformance\\]|should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|HostPath|EmptyDir.volumes
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --build=bazel --ginkgo-parallel=10 --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" 
