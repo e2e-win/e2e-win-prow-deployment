@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
 	git \
 	nano \
 	gnupg \
-	software-properties-common
+	software-properties-common \
+	wget
 
 ENV HOME "/root"
 
@@ -28,6 +29,22 @@ ENV GOROOT "/usr/lib/go-$GO_VERSION"
 ENV GOPATH "$HOME/go"
 ENV GOBIN "$GOROOT/bin"
 ENV PATH "$GOROOT/bin:$PATH:GOPATH/bin"
+
+# install bazel
+RUN apt-get update && apt-get install -y \
+	pkg-config \
+	zip \
+	g++ \
+	zlib1g-dev \
+	unzip \
+	python
+
+ENV BAZEL_VERSION "0.14.1"
+RUN INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"; \
+    DOWNLOAD_URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${INSTALLER}"; \
+    wget -q "${DOWNLOAD_URL}" && \
+    chmod +x "${INSTALLER}" && "./${INSTALLER}" && rm "${INSTALLER}"
+
 
 WORKDIR /root
 COPY build.sh .
