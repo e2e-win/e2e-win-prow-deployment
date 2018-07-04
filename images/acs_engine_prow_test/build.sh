@@ -4,6 +4,9 @@ set -o pipefail
 set -x
 set -e
 
+AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}-rg
+AZ_DEPLOYMENT_NAME=${JOB_NAME}-${PROW_JOB_ID}
+
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
 BRANCH=${BRANCH:-"master"}
 
@@ -51,4 +54,7 @@ cd $KUBE_DIR
 # Note environment variables are set by the prow job
 echo "Running kubetest"
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --build=bazel --ginkgo-parallel=10 --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" 
+
+# TO DO (atuvenie): hyperkube and zip should be passed as params
+
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=10 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" 
