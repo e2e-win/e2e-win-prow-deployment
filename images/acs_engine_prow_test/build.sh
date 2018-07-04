@@ -4,8 +4,8 @@ set -o pipefail
 set -x
 set -e
 
-AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}-rg
-AZ_DEPLOYMENT_NAME=${JOB_NAME}-${PROW_JOB_ID}
+AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}
+AZ_DEPLOYMENT_NAME=${PROW_JOB_ID}
 
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
 BRANCH=${BRANCH:-"master"}
