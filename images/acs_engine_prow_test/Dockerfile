@@ -30,6 +30,24 @@ ENV GOPATH "$HOME/go"
 ENV GOBIN "$GOROOT/bin"
 ENV PATH "$GOROOT/bin:$PATH:GOPATH/bin"
 
+# Install gcloud
+RUN apt-get update && apt-get install -y \
+        tar
+
+ENV PATH=/google-cloud-sdk/bin:$HOME:${PATH} \
+    CLOUDSDK_CORE_DISABLE_PROMPTS=1
+RUN wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz && \
+    tar xzf google-cloud-sdk.tar.gz -C / && \
+    rm google-cloud-sdk.tar.gz && \
+    /google-cloud-sdk/install.sh \
+        --disable-installation-options \
+        --bash-completion=false \
+        --path-update=false \
+        --usage-reporting=false && \
+    gcloud components install alpha beta kubectl && \
+    gcloud info | tee $HOME/gcloud-info.txt
+
+
 # install bazel
 RUN apt-get update && apt-get install -y \
 	pkg-config \
