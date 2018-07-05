@@ -18,17 +18,26 @@ RUN apt-get install apt-transport-https
 RUN apt-get update && apt-get install -y azure-cli
 
 # install golang
-ENV GO_VERSION "1.10"
-RUN add-apt-repository --yes ppa:gophers/archive
-RUN apt-get update && apt-get install -y golang-$GO_VERSION-go
-
+ENV GO_VERSION "1.10.2"
+ENV GO_DOWNLOAD_URL=https://storage.googleapis.com/golang/go$GO_VERSION.linux-amd64.tar.gz
 
 RUN mkdir $HOME/go $HOME/go/src $HOME/go/bin $HOME/go/pkg $HOME/required
 
-ENV GOROOT "/usr/lib/go-$GO_VERSION"
+ENV GOROOT "/usr/lib/go"
 ENV GOPATH "$HOME/go"
 ENV GOBIN "$GOROOT/bin"
 ENV PATH "$GOROOT/bin:$PATH:GOPATH/bin"
+
+RUN apt-get update --fix-missing && apt upgrade -y
+RUN apt-get install --no-install-recommends -y gcc
+
+WORKDIR /tmp
+RUN wget "$GO_DOWNLOAD_URL" -O golang.tar.gz
+RUN tar -zxvf golang.tar.gz
+RUN mv go $GOROOT
+WORKDIR $HOME
+
+RUN go version
 
 # Install gcloud
 RUN apt-get update && apt-get install -y \
@@ -56,13 +65,6 @@ RUN apt-get update && apt-get install -y \
 	zlib1g-dev \
 	unzip \
 	python
-
-ENV BAZEL_VERSION "0.14.1"
-RUN INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"; \
-    DOWNLOAD_URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/${INSTALLER}"; \
-    wget -q "${DOWNLOAD_URL}" && \
-    chmod +x "${INSTALLER}" && "./${INSTALLER}" && rm "${INSTALLER}"
-
 
 WORKDIR /root
 COPY build.sh .
