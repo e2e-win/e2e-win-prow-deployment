@@ -50,6 +50,17 @@ mkdir -p $KUBE_DIR
 git clone $KUBE_REPO $KUBE_DIR
 cd $KUBE_DIR
 
+# Building tests, ginkgo and kubectl
+# Normally kubetest would build all k8s, but since we only need these components
+# it's much faster to build by hand.
+# NOTE: normally it is recomended to build using ./build/run.sh make target . This will
+# run make in a docker container to ensure fresh env for build eachtime. Since it's a prowjob
+# and fresh container each run, there is no need for the extra layer, we can just run
+# make directly.
+
+make WHAT="test/e2e/e2e.test cmd/kubectl vendor/github.com/onsi/ginkgo/ginkgo"
+
+
 # Run kubetest
 # Note environment variables are set by the prow job
 echo "Running kubetest"
