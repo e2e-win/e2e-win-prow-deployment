@@ -4,6 +4,11 @@ set -o pipefail
 set -x
 set -e
 
+OUTPUT_DIR=$HOME/output
+mkdir ${OUTPUT_DIR}
+OUTPUT_FILE=${OUTPUT_DIR}/build-log.txt
+exec &> >(tee -a ${OUTPUT_FILE})
+
 AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}
 AZ_DEPLOYMENT_NAME=prow-${PROW_JOB_ID}
 
@@ -13,14 +18,11 @@ GS_BUCKER_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
 BRANCH=${BRANCH:-"master"}
 
-OUTPUT_DIR=$HOME/output
-
 # Init gcloud
 
 gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
 
 ACS_DIR=${GOPATH}/src/github.com/Azure/acs-engine
-mkdir ${OUTPUT_DIR}
 mkdir -p $ACS_DIR
 
 git clone $REPO $ACS_DIR
