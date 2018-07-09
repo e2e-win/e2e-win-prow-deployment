@@ -4,15 +4,25 @@ set -o pipefail
 set -x
 set -e
 
+OUTPUT_DIR=$HOME/output
+mkdir ${OUTPUT_DIR}
+OUTPUT_FILE=${OUTPUT_DIR}/build-log.txt
+exec &> >(tee -a ${OUTPUT_FILE})
+
 AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}
 AZ_DEPLOYMENT_NAME=prow-${PROW_JOB_ID}
+
+GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
+GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
 
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
 BRANCH=${BRANCH:-"master"}
 
-OUTPUT_DIR=$HOME/output
+# Init gcloud
+
+gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+
 ACS_DIR=${GOPATH}/src/github.com/Azure/acs-engine
-mkdir ${OUTPUT_DIR}
 mkdir -p $ACS_DIR
 
 git clone $REPO $ACS_DIR
@@ -50,6 +60,13 @@ mkdir -p $KUBE_DIR
 git clone $KUBE_REPO $KUBE_DIR
 cd $KUBE_DIR
 
+# Building tests, ginkgo and kubectl
+# Normally kubetest would build all k8s, but since we only need these components
+# it's much faster to build by hand.
+
+make WHAT="test/e2e/e2e.test cmd/kubectl vendor/github.com/onsi/ginkgo/ginkgo"
+
+
 # Run kubetest
 # Note environment variables are set by the prow job
 echo "Running kubetest"
@@ -57,4 +74,10 @@ echo "Running kubetest"
 
 # TO DO (atuvenie): hyperkube and zip should be passed as params
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=10 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" 
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=10 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+
+# Uploading results
+echo "Uploading results"
+
+gsutil cp -r ${OUTPUT_DIR} ${GS_BUCKET_FULL_PATH}
+
