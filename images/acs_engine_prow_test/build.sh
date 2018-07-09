@@ -18,6 +18,23 @@ GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
 BRANCH=${BRANCH:-"master"}
 
+function prepare_repo {
+
+    git config --global user.email "e2e-win@xample.com"
+    git config --global user.name "Prow Job Bot"
+    git clone $REPO $ACS_DIR
+    cd $ACS_DIR
+    git checkout $BRANCH
+
+    if [ "${JOB_TYPE}" == "presubmit" ]
+    then
+        # this is a pull request and we should pull the specific ref
+        git fetch origin pull/$PULL_NUMBER/head:pr/$PULL_NUMBER
+        git merge --no-ff --m "PR to test #${PULL_NUMBER}" pr/$PULL_NUMBER
+    fi
+    git status
+}
+
 # Init gcloud
 
 gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
@@ -25,9 +42,7 @@ gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS
 ACS_DIR=${GOPATH}/src/github.com/Azure/acs-engine
 mkdir -p $ACS_DIR
 
-git clone $REPO $ACS_DIR
-cd $ACS_DIR
-git checkout master
+prepare_repo
 
 # install glide
 go get github.com/Masterminds/glide
