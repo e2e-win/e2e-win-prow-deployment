@@ -128,4 +128,19 @@ echo "Running kubetest"
 
 # TO DO (atuvenie): hyperkube and zip should be passed as params
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+AZURE_AVAILABLE_LOCATIONS=("southeastasia" "eastus" "southcentralus" "westeurope" "westus2" "australiacentral" "australiacentral2")
+
+function get_random_azure_location {
+    loc_count=${#AZURE_AVAILABLE_LOCATIONS[@]}
+    echo ${AZURE_AVAILABLE_LOCATIONS[$(($RANDOM % $loc_count + 1))]}
+}
+
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 \
+            --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 \
+            --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
+            --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 \
+            --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 \
+            --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
+            --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
+            --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=$(get_random_azure_location) \
+            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
