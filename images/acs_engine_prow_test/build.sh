@@ -59,11 +59,12 @@ BRANCH=${BRANCH:-"master"}
 
 function prepare_repo {
 
-    git config --global user.email "e2e-win@xample.com"
+    git config --global user.email "e2e-win@example.com"
     git config --global user.name "Prow Job Bot"
     git clone $REPO $ACS_DIR
     cd $ACS_DIR
     git checkout $BRANCH
+    git show --name-only
 
     if [ "${JOB_TYPE}" == "presubmit" ]
     then
