@@ -145,4 +145,6 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
-            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" || true
+
+copy_acs_engine_logs
