@@ -15,6 +15,34 @@ AZ_DEPLOYMENT_NAME=prow-${PROW_JOB_ID}
 GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
 GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
 
+ACS_GENERATE_DIR_REGEX="acs*"
+ACS_API_MODEL_FILES=("kubernetes.json" "apimodel.json")
+ACS_API_MODEL_SENSITIVE_KEYS=("secret" "clientId" "keyData" "clientPrivateKey" "caCertificate" "etcdServerPrivateKey" \
+                              "apiServerCertificate" "clientCertificate" "etcdClientPrivateKey" "etcdServerCertificate" \
+                              "caPrivateKey" "etcdClientCertificate" "etcdPeerCertificates" "etcdPeerPrivateKeys" "kubeConfigPrivateKey" \
+                              "apiServerPrivateKey" "kubeConfigCertificate")
+
+function redact_file {
+    # redact sensitive information from the logs ( i.e clientSecret / clientId etc )
+    for key in ${ACS_API_MODEL_SENSITIVE_KEYS[@]}; do
+          sed -i "/\"${key}\": \[/,+2d" $1
+          sed -i "/${key}/d" $1
+    done
+}
+
+function copy_acs_engine_logs {
+    # we use a regex here, not really pretty, but it will work since we know for a fact it's the only dir to match.
+    # kubetest generates logs in a tempdir with the form acs[0-9]+
+    pushd ${ACS_GENERATE_DIR_REGEX}
+    for file in ${ACS_API_MODEL_FILES[@]}; do
+            # first redact, then copy. If redating fails for some reason, the logs will end up on the server in clear
+            # since pushing logs is automatic on exit
+            redact_file $file
+            cp $file $OUTPUT_DIR
+    done
+    popd
+}
+
 function upload_results {
 
     # Uploading results
@@ -24,7 +52,6 @@ function upload_results {
 }
 
 trap "upload_results" EXIT
-
 
 
 REPO=${REPO:-"http://github.com/Azure/acs-engine"}
@@ -101,4 +128,4 @@ echo "Running kubetest"
 
 # TO DO (atuvenie): hyperkube and zip should be passed as params
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=westus2 --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
