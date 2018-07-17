@@ -1,0 +1,16 @@
+triggers:
+- repos:
+  - Azure/acs-engine
+  trusted_org: magic_unicorn
+
+plugins:
+  e2e-win/kubernetes:
+  - size
+  - trigger
+  e2e-win/test-infra:
+  - size
+  - trigger
+  - lgtm
+  - approve
+  Azure/acs-engine:
+  - trigger
