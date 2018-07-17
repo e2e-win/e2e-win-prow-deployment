@@ -15,7 +15,7 @@ AZ_DEPLOYMENT_NAME=prow-${PROW_JOB_ID}
 GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
 GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
 
-ACS_GENERATE_DIR_REGEX="acs*"
+ACS_GENERATE_DIR_REGEX="${HOME}/acs*"
 ACS_API_MODEL_FILES=("kubernetes.json" "apimodel.json")
 ACS_API_MODEL_SENSITIVE_KEYS=("secret" "clientId" "keyData" "clientPrivateKey" "caCertificate" "etcdServerPrivateKey" \
                               "apiServerCertificate" "clientCertificate" "etcdClientPrivateKey" "etcdServerCertificate" \
@@ -137,6 +137,9 @@ function get_random_azure_location {
 
 LOCATION=$(get_random_azure_location)
 
+
+set +e
+
 ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 \
             --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 \
             --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
@@ -145,6 +148,6 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
-            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" || true
+            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
 
 copy_acs_engine_logs
