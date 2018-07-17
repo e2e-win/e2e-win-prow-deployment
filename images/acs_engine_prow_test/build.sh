@@ -136,12 +136,10 @@ AZURE_AVAILABLE_LOCATIONS=("southeastasia" "eastus" "southcentralus" "westeurope
 
 function get_random_azure_location {
     loc_count=${#AZURE_AVAILABLE_LOCATIONS[@]}
-    echo ${AZURE_AVAILABLE_LOCATIONS[$(($RANDOM % $loc_count + 1))]}
+    echo ${AZURE_AVAILABLE_LOCATIONS[$(($RANDOM % $loc_count))]}
 }
 
 LOCATION=$(get_random_azure_location)
-
-
 
 set +e
 
@@ -153,7 +151,7 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
-            --acsengine-networkPlugin=${NETWORK_PLUGIN}
+            --acsengine-networkPlugin=${NETWORK_PLUGIN} \
             --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
 
 copy_acs_engine_logs
