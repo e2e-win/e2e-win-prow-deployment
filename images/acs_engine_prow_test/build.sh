@@ -143,12 +143,10 @@ LOCATION=$(get_random_azure_location)
 
 set +e
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=${GINKGO_PARALLEL} \
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=true --ginkgo-parallel=${GINKGO_PARALLEL} \
             --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=${AGENT_NODES} \
             --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
             --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 \
-            --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 \
-            --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
             --acsengine-networkPlugin=${NETWORK_PLUGIN} \
