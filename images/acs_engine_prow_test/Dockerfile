@@ -26,15 +26,14 @@ RUN mkdir $HOME/go $HOME/go/src $HOME/go/bin $HOME/go/pkg $HOME/required
 ENV GOROOT "/usr/lib/go"
 ENV GOPATH "$HOME/go"
 ENV GOBIN "$GOROOT/bin"
-ENV PATH "$GOROOT/bin:$PATH:GOPATH/bin"
+ENV PATH "$GOROOT/bin:$PATH:$GOPATH/bin"
 
 RUN apt-get update --fix-missing && apt upgrade -y
 RUN apt-get install --no-install-recommends -y gcc
 
 WORKDIR /tmp
 RUN wget "$GO_DOWNLOAD_URL" -O golang.tar.gz
-RUN tar -zxvf golang.tar.gz
-RUN mv go $GOROOT
+RUN mkdir -p /usr/lib && tar -zxvf golang.tar.gz -C /usr/lib
 WORKDIR $HOME
 
 RUN go version
