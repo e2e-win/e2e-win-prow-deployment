@@ -155,6 +155,7 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
             --acsengine-networkPlugin=${NETWORK_PLUGIN} \
-            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]" \
             --dump=$ARTIFACTS_DIR
+
 copy_acs_engine_logs
