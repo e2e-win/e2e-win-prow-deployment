@@ -5,7 +5,9 @@ set -x
 set -e
 
 OUTPUT_DIR=$HOME/output
+ARTIFACTS_DIR=$OUTPUT_DIR/artifacts
 mkdir ${OUTPUT_DIR}
+mkdir ${ARTIFACTS_DIR}
 OUTPUT_FILE=${OUTPUT_DIR}/build-log.txt
 exec &> >(tee -a ${OUTPUT_FILE})
 
@@ -154,5 +156,5 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
             --acsengine-networkPlugin=${NETWORK_PLUGIN} \
             --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
-
+            --dump=$ARTIFACTS_DIR
 copy_acs_engine_logs
