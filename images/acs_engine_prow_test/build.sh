@@ -15,12 +15,16 @@ AZ_DEPLOYMENT_NAME=prow-${PROW_JOB_ID}
 GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
 GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
 
-ACS_GENERATE_DIR_REGEX="acs*"
+ACS_GENERATE_DIR_REGEX="${HOME}/acs*"
 ACS_API_MODEL_FILES=("kubernetes.json" "apimodel.json")
 ACS_API_MODEL_SENSITIVE_KEYS=("secret" "clientId" "keyData" "clientPrivateKey" "caCertificate" "etcdServerPrivateKey" \
                               "apiServerCertificate" "clientCertificate" "etcdClientPrivateKey" "etcdServerCertificate" \
                               "caPrivateKey" "etcdClientCertificate" "etcdPeerCertificates" "etcdPeerPrivateKeys" "kubeConfigPrivateKey" \
                               "apiServerPrivateKey" "kubeConfigCertificate")
+
+GINKGO_PARALLEL=${GINKGO_PARALLEL:-10}
+AGENT_NODES=${AGENT_NODES:-4}
+NETWORK_PLUGIN=${NETWORK_PLUGIN:-"azure"}
 
 function redact_file {
     # redact sensitive information from the logs ( i.e clientSecret / clientId etc )
@@ -129,19 +133,26 @@ echo "Running kubetest"
 
 # TO DO (atuvenie): hyperkube and zip should be passed as params
 
-AZURE_AVAILABLE_LOCATIONS=("southeastasia" "eastus" "southcentralus" "westeurope" "westus2" "australiacentral" "australiacentral2")
+AZURE_AVAILABLE_LOCATIONS=("southeastasia" "eastus" "southcentralus" "westeurope" "westus2")
 
 function get_random_azure_location {
     loc_count=${#AZURE_AVAILABLE_LOCATIONS[@]}
-    echo ${AZURE_AVAILABLE_LOCATIONS[$(($RANDOM % $loc_count + 1))]}
+    echo ${AZURE_AVAILABLE_LOCATIONS[$(($RANDOM % $loc_count))]}
 }
 
-${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=false --ginkgo-parallel=12 \
-            --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=4 \
+LOCATION=$(get_random_azure_location)
+
+set +e
+
+${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=true --ginkgo-parallel=${GINKGO_PARALLEL} \
+            --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=${AGENT_NODES} \
             --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
             --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 \
-            --acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176 \
-            --acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip \
+            --acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.0 \
+            --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.0-1int.zip \
             --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
-            --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=$(get_random_azure_location) \
+            --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
+            --acsengine-networkPlugin=${NETWORK_PLUGIN} \
             --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"
+
+copy_acs_engine_logs
