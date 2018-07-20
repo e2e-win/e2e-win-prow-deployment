@@ -87,15 +87,18 @@ gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS
 
 ACS_DIR=${GOPATH}/src/github.com/Azure/acs-engine
 mkdir -p $ACS_DIR
-
 prepare_repo
-
 # install glide
 go get github.com/Masterminds/glide
 
 # build acs-engine
 echo "Installing dependencies"
-glide install
+
+# acs-engine PR #3522 intends on replacing glide with godeps.
+# Glide will obv not work for this pr, hacking so that it will build
+# both this PR and the ones the still use glide
+# until this PR gets merged.
+glide install || true 
 echo "Building acs-engine"
 make build
 
