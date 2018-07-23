@@ -46,6 +46,19 @@ RUN INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"; \
     wget -q "${DOWNLOAD_URL}" && \
     chmod +x "${INSTALLER}" && "./${INSTALLER}" && rm "${INSTALLER}"
 
+ENV PATH=/google-cloud-sdk/bin:$HOME:${PATH} \
+    CLOUDSDK_CORE_DISABLE_PROMPTS=1
+RUN wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz && \
+    tar xzf google-cloud-sdk.tar.gz -C / && \
+    rm google-cloud-sdk.tar.gz && \
+    /google-cloud-sdk/install.sh \
+        --disable-installation-options \
+        --bash-completion=false \
+        --path-update=false \
+        --usage-reporting=false && \
+    gcloud components install alpha beta kubectl && \
+    gcloud info | tee $HOME/gcloud-info.txt
+
 ENV HOME /root
 
 COPY ./build_kubetest.sh .
