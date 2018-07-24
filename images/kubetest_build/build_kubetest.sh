@@ -101,6 +101,7 @@ git clone $KUBE_REPO $KUBE_DIR
 pushd $KUBE_DIR
 
 echo "Running kubetest"
+export KUBECTL_PATH=$(which kubectl)
 $BAZEL_OUTPUT --deployment=acsengine --provider=azure --test=false --up=true --down=true --ginkgo-parallel=${GINKGO_PARALLEL} \
               --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=${AGENT_NODES} \
               --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
