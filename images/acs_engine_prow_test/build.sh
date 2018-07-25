@@ -130,7 +130,6 @@ cd $KUBE_DIR
 
 make WHAT="test/e2e/e2e.test cmd/kubectl vendor/github.com/onsi/ginkgo/ginkgo"
 
-
 # Run kubetest
 # Note environment variables are set by the prow job
 echo "Running kubetest"
