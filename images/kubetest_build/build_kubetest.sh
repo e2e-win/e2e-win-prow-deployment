@@ -114,8 +114,14 @@ $BAZEL_OUTPUT --deployment=acsengine --provider=azure --test=false --up=true --d
 
 popd
 
+function az-clean () {
+    set +x
+    az "$@"
+    set -x
+}
+
 function upload_blob() {
-    az storage blob upload --container-name $1 --name $2 --file $BAZEL_OUTPUT --account-name $AZ_STORAGE_ACCOUNT --account-key $AZ_STORAGE_KEY
+    az-clean storage blob upload --container-name $1 --name $2 --file $BAZEL_OUTPUT --account-name $AZ_STORAGE_ACCOUNT --account-key $AZ_STORAGE_KEY
 }
 
 echo "Uploading kubetest to storage blob"
