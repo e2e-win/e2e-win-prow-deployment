@@ -40,7 +40,7 @@ RUN go version
 
 # Install gcloud
 RUN apt-get update && apt-get install -y \
-        tar
+	tar
 
 ENV PATH=/google-cloud-sdk/bin:$HOME:${PATH} \
     CLOUDSDK_CORE_DISABLE_PROMPTS=1
@@ -48,10 +48,10 @@ RUN wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.ta
     tar xzf google-cloud-sdk.tar.gz -C / && \
     rm google-cloud-sdk.tar.gz && \
     /google-cloud-sdk/install.sh \
-        --disable-installation-options \
-        --bash-completion=false \
-        --path-update=false \
-        --usage-reporting=false && \
+	--disable-installation-options \
+	--bash-completion=false \
+	--path-update=false \
+	--usage-reporting=false && \
     gcloud components install alpha beta kubectl && \
     gcloud info | tee $HOME/gcloud-info.txt
 
@@ -63,8 +63,11 @@ RUN apt-get update && apt-get install -y \
 	g++ \
 	zlib1g-dev \
 	unzip \
-	python
+	python \
+	python-pip && \
+    pip install junitparser
 
 WORKDIR /root
-COPY build.sh .
-ENTRYPOINT ["./build.sh"]
+ADD ["check_tests.py", "/root"]
+ADD ["build.sh", "/root"]
+ENTRYPOINT ["build.sh"]

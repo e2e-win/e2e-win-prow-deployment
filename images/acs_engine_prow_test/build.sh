@@ -68,7 +68,7 @@ function prepare_repo {
     git config --global user.email "e2e-win@example.com"
     git config --global user.name "Prow Job Bot"
     git clone $REPO $ACS_DIR
-    cd $ACS_DIR
+    pushd $ACS_DIR
     git checkout $BRANCH
     git show --name-only
 
@@ -101,6 +101,7 @@ echo "Installing dependencies"
 glide install || true 
 echo "Building acs-engine"
 make build
+popd
 
 # Add acs-engine build dir to path
 
@@ -122,7 +123,7 @@ KUBE_DIR=${GOPATH}/src/k8s.io/kubernetes
 mkdir -p $KUBE_DIR
 
 git clone $KUBE_REPO $KUBE_DIR
-cd $KUBE_DIR
+pushd $KUBE_DIR
 
 # Building tests, ginkgo and kubectl
 # Normally kubetest would build all k8s, but since we only need these components
@@ -160,5 +161,8 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
             --acsengine-networkPlugin=${NETWORK_PLUGIN} \
             --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[Disruptive\\]|volumes should support \\((non\\-)?root,[0-9]{4},(default|tmpfs)\\)|should be consumable from pods in volume (as non-root .*\\[NodeConformance\\] \\[Conformance\\]|with (mappings|defaultMode) .+\\[NodeConformance\\] \\[Conformance\\])|\\[sig-storage\\] EmptyDir volumes  volume on (default|tmpfs)|should give a volume the correct mode|should set (Default)?(m|M)ode on (item )?file(s)?" \
             --dump=$ARTIFACTS_DIR
+set -e
+popd
+./check_tests.py "$ARTIFACTS_DIR/junit_runner.xml"
 
 copy_acs_engine_logs
