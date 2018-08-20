@@ -309,9 +309,9 @@ presubmits:
         - image: gcr.io/win-e2e-test/build_acs_engine
           env:
           - name: GINKGO_PARALLEL
-            value: "10"
+            value: "8"
           - name: AGENT_NODES
-            value: "6"
+            value: "3"
     run_after_success:
     - name: build-acs
       agent: kubernetes
