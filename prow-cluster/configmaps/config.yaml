@@ -312,18 +312,18 @@ presubmits:
             value: "8"
           - name: AGENT_NODES
             value: "3"
-    run_after_success:
-    - name: build-acs
-      agent: kubernetes
-      context: build-acs
-      labels:
-        preset-service-account: "true"
-        preset-azure-creds: "true"
-        preset-azure-ssh: "true"
-        preset-azure-storage: "true"
-      spec:
-        containers:
-          - image: gcr.io/win-e2e-test/build_acs
+#    run_after_success:
+#    - name: build-acs
+#      agent: kubernetes
+#      context: build-acs
+#      labels:
+#        preset-service-account: "true"
+#        preset-azure-creds: "true"
+#        preset-azure-ssh: "true"
+#        preset-azure-storage: "true"
+#      spec:
+#        containers:
+#          - image: gcr.io/win-e2e-test/build_acs
 
 postsubmits:
   e2e-win/test-infra:
