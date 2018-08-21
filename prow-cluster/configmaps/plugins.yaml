@@ -1,6 +1,6 @@
 triggers:
 - repos:
-  - Azure/acs-engine
+  - e2e-win/acs-engine
   trusted_org: magic_unicorn
 
 plugins:
@@ -12,5 +12,5 @@ plugins:
   - trigger
   - lgtm
   - approve
-  Azure/acs-engine:
+  e2e-win/acs-engine:
   - trigger
