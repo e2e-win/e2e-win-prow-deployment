@@ -27,6 +27,7 @@ ACS_API_MODEL_SENSITIVE_KEYS=("secret" "clientId" "keyData" "clientPrivateKey" "
 GINKGO_PARALLEL=${GINKGO_PARALLEL:-10}
 AGENT_NODES=${AGENT_NODES:-4}
 NETWORK_PLUGIN=${NETWORK_PLUGIN:-"azure"}
+OS_TYPE=${OS_TYPE:-"Windows"}
 
 function redact_file {
     # redact sensitive information from the logs ( i.e clientSecret / clientId etc )
@@ -150,17 +151,19 @@ LOCATION=$(get_random_azure_location)
 
 set +e
 
+
 ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down=true --ginkgo-parallel=${GINKGO_PARALLEL} \
-            --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=${AGENT_NODES} \
-            --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
-            --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 \
-            --acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.2 \
-            --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.2-1int.zip \
-            --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
-            --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
-            --acsengine-networkPlugin=${NETWORK_PLUGIN} \
-            --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[Disruptive\\]|volumes should support \\((non\\-)?root,[0-9]{4},(default|tmpfs)\\)|should be consumable from pods in volume (as non-root .*\\[NodeConformance\\] \\[Conformance\\]|with (mappings|defaultMode) .+\\[NodeConformance\\] \\[Conformance\\])|\\[sig-storage\\] EmptyDir volumes  volume on (default|tmpfs)|should give a volume the correct mode|should set (Default)?(m|M)ode on (item )?file(s)?" \
-            --dump=$ARTIFACTS_DIR
+                --acsengine-resource-name=${AZ_DEPLOYMENT_NAME} --acsengine-agentpoolcount=${AGENT_NODES} \
+                --acsengine-resourcegroup-name=${AZ_RG_NAME} --acsengine-admin-password=Passw0rdAdmin \
+                --acsengine-admin-username=azureuser --acsengine-orchestratorRelease=1.11 \
+                --acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.2 \
+                --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.2-1int.zip \
+                --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
+                --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
+                --acsengine-networkPlugin=${NETWORK_PLUGIN} \
+                --acsengine-agentOSType=${OS_TYPE} \
+                --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[Disruptive\\]|volumes should support \\((non\\-)?root,[0-9]{4},(default|tmpfs)\\)|should be consumable from pods in volume (as non-root .*\\[NodeConformance\\] \\[Conformance\\]|with (mappings|defaultMode) .+\\[NodeConformance\\] \\[Conformance\\])|\\[sig-storage\\] EmptyDir volumes  volume on (default|tmpfs)|should give a volume the correct mode|should set (Default)?(m|M)ode on (item )?file(s)?" \
+                --dump=$ARTIFACTS_DIR
 set -e
 popd
 ./check_tests.py "$ARTIFACTS_DIR/junit_runner.xml"

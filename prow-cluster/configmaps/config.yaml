@@ -46,19 +46,24 @@ presets:
     value: atuvenie
   - name: WIN_BUILD
     value: https://raw.githubusercontent.com/adelina-t/acs-engine/change_gen_script_for_e2e/scripts/build-windows-k8s.sh
-  - name: KUBE_TEST_REPO_LIST
-    value: /etc/repo-list/repo-list
   volumes:
   - name: azure-ssh
     secret:
       secretName: azure-ssh
-  - name: repo-list
-    secret:
-      secretName: repo-list
   volumeMounts:
   - name: azure-ssh
     mountPath: /etc/azure-ssh
     readOnly: true
+- labels:
+    preset-repo-list: "true"
+  env:
+  - name: KUBE_TEST_REPO_LIST
+    value: /etc/repo-list/repo-list
+  volume:
+  - name: repo-list
+    secret:
+      secretName: repo-list
+  volumeMounts:
   - name: repo-list
     mountPath: /etc/repo-list
     readOnly: true
@@ -304,6 +309,7 @@ presubmits:
       preset-service-account: "true"
       preset-azure-creds: "true"
       preset-azure-ssh: "true"
+      preset-repo-list: "true"
     spec:
       containers:
         - image: gcr.io/win-e2e-test/build_acs_engine
@@ -324,6 +330,29 @@ presubmits:
 #      spec:
 #        containers:
 #          - image: gcr.io/win-e2e-test/build_acs
+
+  - name: pull-acs-engine-linux
+    agent: kubernetes
+    context: pull-acs-engine
+    always_run: true
+    max_concurrency: 5
+    rerun_command: "/test pull-acs-engine-linux"
+    trigger: "/test pull-acs-engine-linux"
+    labels:
+      preset-service-account: "true"
+      preset-azure-creds: "true"
+      preset-azure-ssh: "true"
+      preset-azure-repo-list: "false"
+    spec:
+      containers:
+        - image: gcr.io/win-e2e-test/build_acs_engine
+          env:
+          - name: GINKGO_PARALLEL
+            value: "8"
+          - name: AGENT_NODES
+            value: "3"
+          - name: OS_TYPE
+            value: "linux"
 
 postsubmits:
   e2e-win/test-infra:
