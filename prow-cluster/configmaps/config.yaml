@@ -325,6 +325,28 @@ presubmits:
 #        containers:
 #          - image: gcr.io/win-e2e-test/build_acs
 
+  - name: pull-acs-engine-linux
+    agent: kubernetes
+    context: pull-acs-engine
+    always_run: true
+    max_concurrency: 5
+    rerun_command: "/test pull-acs-engine-linux"
+    trigger: "/test pull-acs-engine-linux"
+    labels:
+      preset-service-account: "true"
+      preset-azure-creds: "true"
+      preset-azure-ssh: "true"
+    spec:
+      containers:
+        - image: gcr.io/win-e2e-test/build_acs_engine
+          env:
+          - name: GINKGO_PARALLEL
+            value: "8"
+          - name: AGENT_NODES
+            value: "3"
+          - name: OS_TYPE
+            value: "linux"
+
 postsubmits:
   e2e-win/test-infra:
   - name: test-build-kubetest-post
