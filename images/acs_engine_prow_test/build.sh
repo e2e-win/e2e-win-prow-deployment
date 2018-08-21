@@ -61,7 +61,7 @@ function upload_results {
 trap "upload_results" EXIT
 
 
-REPO=${REPO:-"http://github.com/Azure/acs-engine"}
+REPO=${REPO:-"http://github.com/${REPO_OWNER}/${REPO_NAME}"}
 BRANCH=${BRANCH:-"master"}
 
 function prepare_repo {
