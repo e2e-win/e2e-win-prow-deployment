@@ -59,7 +59,7 @@ presets:
   env:
   - name: KUBE_TEST_REPO_LIST
     value: /etc/repo-list/repo-list
-  volume:
+  volumes:
   - name: repo-list
     secret:
       secretName: repo-list
@@ -297,7 +297,7 @@ presubmits:
       containers:
         - image: gcr.io/win-e2e-test/build_acs_engine
       
-  win-e2e/acs-engine:
+  e2e-win/acs-engine:
   - name: pull-acs-engine
     agent: kubernetes
     context: pull-acs-engine
@@ -352,7 +352,7 @@ presubmits:
           - name: AGENT_NODES
             value: "3"
           - name: OS_TYPE
-            value: "linux"
+            value: "Linux"
 
 postsubmits:
   e2e-win/test-infra:
