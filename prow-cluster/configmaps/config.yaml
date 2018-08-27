@@ -297,7 +297,7 @@ presubmits:
       containers:
         - image: gcr.io/win-e2e-test/build_acs_engine
       
-  e2e-win/acs-engine:
+  Azure/acs-engine:
   - name: pull-acs-engine
     agent: kubernetes
     context: pull-acs-engine
