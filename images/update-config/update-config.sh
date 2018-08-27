@@ -7,7 +7,7 @@ set -o pipefail
 
 function update_config () {
     local config="$1"
-    kubectl create configmap $config --from-file=$config.yaml --dry-run -o yaml | kubectl replace configmap $config -f -
+    kubectl create configmap $config --from-file=${config}=${config}.yaml --dry-run -o yaml | kubectl replace configmap $config -f -
 }
 
 function validate () {
