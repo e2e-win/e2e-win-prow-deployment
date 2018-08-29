@@ -14,3 +14,6 @@ plugins:
   - approve
   Azure/acs-engine:
   - trigger
+  e2e-win/e2e-win-prow-deployment:
+  - trigger
+
