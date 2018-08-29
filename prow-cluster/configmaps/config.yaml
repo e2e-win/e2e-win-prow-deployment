@@ -224,65 +224,6 @@ presubmits:
         - name: docker-graph
           emptyDir: {}
 
-  - name: pull-kubernetes-e2e-win-fast
-    agent: kubernetes
-    context: pull-kubernetes-e2e-win-fast
-    always_run: false
-    rerun_command: "/test pull-kubernetes-e2e-win-fast"
-    trigger: "(?m)^/test( all| pull-kubernetes-e2e-win-fast),?(\\s+|$)"
-    skip_branches:
-    - release-1.10 # different bazel version
-    - release-1.9 # need to cherry pick back https://github.com/kubernetes/kubernetes/pull/59251, possibly others
-    - release-1.8 # different set of targets
-    labels:
-      preset-service-account: "true"
-      preset-azure-creds: "true"
-      preset-azure-ssh: "true"
-    spec:
-      containers:
-      - image: atuvenie/kubekins-e2e:1.0-master
-        args:
-        - "--job=$(JOB_NAME)"
-        - "--repo=github.com/e2e-win/$(REPO_NAME)=$(PULL_REFS)"
-        - "--root=/go/src"
-        - "--service-account=/etc/service-account/service-account.json"
-        - "--upload=gs://win-e2e-test/pr-logs"
-        - "--timeout=600"
-        - "--scenario=kubernetes_e2e"
-        - "--" # end bootstrap args, scenario args below
-        - "--deployment=acsengine"
-        - "--provider=azure"
-        - "--test=true"
-        - "--up=true"
-        - "--down=false"
-        - "--build=bazel"
-        - "--ginkgo-parallel=8"
-        - "--acsengine-admin-password=$ACS_PASSWORD"
-        - "--acsengine-admin-username=$ACS_USER"
-        - "--acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.18.9/acs-engine-v0.18.9-linux-amd64.tar.gz"
-        - "--acsengine-creds=$AZURE_CREDENTIALS"
-        - "--acsengine-agentpoolcount=4"
-        - "--acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE"
-        - "--acsengine-winZipBuildScript=$WIN_BUILD"
-        - "--acsengine-location=westus2"
-        - "--acsengine-orchestratorRelease=1.11"
-        - "--acsengine-win-binaries-url=https://k8szipstorage.blob.core.windows.net/mystoragecontainer/1011960828217266176.zip"
-        - "--acsengine-hyperkube-url=atuvenie/hyperkube-amd64:1011960828217266176"
-        - "--test_args=--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\]"      
-  #- "--test_args=--ginkgo.dryRun=false --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|should.provide.DNS.for.the.cluster..\\[Conformance\\]|should.call.prestop.when.killing.a.pod..\\[Conformance\\]|should.enable.privileged.commands|should.support.remote.command.execution.over.websockets.\\[NodeConformance\\]|should.test.kubelet.managed./etc/hosts.file.\\[NodeConformance\\].\\[Conformance\\]|should.invoke.init.containers.on.a.RestartAlways.pod|should.create.and.stop.a.working.application..\\[Conformance\\]|should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|HostPath|EmptyDir.volumes"
-        env:
-        - name: DOCKER_IN_DOCKER_ENABLED
-          value: "true"
-          # docker-in-docker needs privileged mode
-        volumeMounts:
-        - name: docker-graph
-          mountPath: /docker-graph
-        securityContext:
-          privileged: true
-      volumes:
-        - name: docker-graph
-          emptyDir: {}
-
   - name: test-acs-engine-stable
     agent: kubernetes
     context: test-acs-engine-stable
@@ -438,6 +379,57 @@ periodics:
   spec:
     containers:
     - image: gcr.io/win-e2e-test/build_kubetest:latest
+
+- interval: 4h
+name: pull-kubernetes-e2e-win-1-11-fast
+agent: kubernetes
+context: pull-kubernetes-e2e-win-1-11-fast
+labels:
+  preset-service-account: "true"
+  preset-azure-creds: "true"
+  preset-azure-ssh: "true"
+spec:
+  containers:
+  - image: atuvenie/kubekins-e2e:1.0-master
+    args:
+    - "--job=$(JOB_NAME)"
+    - "--repo=github.com/e2e-win/kubernetes=master"
+    - "--root=/go/src"
+    - "--service-account=/etc/service-account/service-account.json"
+    - "--upload=gs://win-e2e-test/pr-logs"
+    - "--timeout=600"
+    - "--scenario=kubernetes_e2e"
+    - "--" # end bootstrap args, scenario args below
+    - --deployment=acsengine
+    - --provider=azure
+    - --test=true
+    - --up=true
+    - --down=true
+    - --ginkgo-parallel=8
+    - --acsengine-admin-password=$ACS_PASSWORD
+    - --acsengine-admin-username=$ACS_USER
+    - --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.1/acs-engine-v0.21.1-linux-amd64.tar.gz
+    - --acsengine-creds=$AZURE_CREDENTIALS
+    - --acsengine-agentpoolcount=4
+    - --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE
+    - --acsengine-winZipBuildScript=$WIN_BUILD
+    - --acsengine-location=westus2
+    - --acsengine-orchestratorRelease=1.11
+    - --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.2-1int.zip
+    - --acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.2
+    - --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.default.medium.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.tmpfs.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].HostPath.should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]" \
+    env:
+    - name: DOCKER_IN_DOCKER_ENABLED
+      value: "true"
+      # docker-in-docker needs privileged mode
+    volumeMounts:
+    - name: docker-graph
+      mountPath: /docker-graph
+    securityContext:
+      privileged: true
+  volumes:
+    - name: docker-graph
+      emptyDir: {}
 
 tide:
   merge_method:
