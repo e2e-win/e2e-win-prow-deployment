@@ -411,7 +411,8 @@ periodics:
       - --ginkgo-parallel=8
       - --acsengine-admin-password=Passw0rdAdmin
       - --acsengine-admin-username=azureuser
-      - --acsengine-resource-name=${JOB_NAME}-${PROW_JOB_ID}
+      - --acsengine-resource-name=prow-${PROW_JOB_ID}
+      - --acsengine-resourcegroup-name=${JOB_NAME}-${PROW_JOB_ID}
       - --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.1/acs-engine-v0.21.1-linux-amd64.tar.gz
       - --acsengine-creds=$AZURE_CREDENTIALS
       - --acsengine-agentpoolcount=4
