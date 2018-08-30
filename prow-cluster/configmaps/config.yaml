@@ -202,8 +202,8 @@ presubmits:
         - "--down=false"
         - "--build=bazel"
         - "--ginkgo-parallel=8"
-        - "--acsengine-admin-password=$ACS_PASSWORD"
-        - "--acsengine-admin-username=$ACS_USER"
+        - "--acsengine-admin-password=Passw0rdAdmin"
+        - "--acsengine-admin-username=$azureuser"
         - "--acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.18.9/acs-engine-v0.18.9-linux-amd64.tar.gz"
         - "--acsengine-orchestratorRelease=1.11"
         - "--acsengine-creds=$AZURE_CREDENTIALS"
@@ -388,6 +388,8 @@ periodics:
     preset-service-account: "true"
     preset-azure-creds: "true"
     preset-azure-ssh: "true"
+    preset-azure-storage: "true"
+    preset-repo-list: "true"
   spec:
     containers:
     - image: gcr.io/win-e2e-test/kubekins-e2e:latest-master
@@ -406,8 +408,8 @@ periodics:
       - --up=true
       - --down=true
       - --ginkgo-parallel=8
-      - --acsengine-admin-password=$ACS_PASSWORD
-      - --acsengine-admin-username=$ACS_USER
+      - --acsengine-admin-password=Passw0rdAdmin
+      - --acsengine-admin-username=azureuser
       - --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.1/acs-engine-v0.21.1-linux-amd64.tar.gz
       - --acsengine-creds=$AZURE_CREDENTIALS
       - --acsengine-agentpoolcount=4
