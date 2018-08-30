@@ -402,6 +402,7 @@ periodics:
       - "--timeout=600"
       - "--scenario=kubernetes_e2e"
       - "--" # end bootstrap args, scenario args below
+      - --build=bazel
       - --deployment=acsengine
       - --provider=azure
       - --test=true
