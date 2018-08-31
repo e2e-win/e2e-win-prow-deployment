@@ -368,7 +368,7 @@ postsubmits:
       preset-kube-config: "true"
     spec:
       containers:
-      - image: papagalu/update-config 
+      - image: gcr.io/win-e2e-test/update-config
 
 periodics:
 - interval: 24h
@@ -380,7 +380,7 @@ periodics:
     containers:
     - image: gcr.io/win-e2e-test/build_kubetest:latest
 
-- interval: 4h
+- interval: 3h
   name: pull-kubernetes-e2e-win-1-11-fast
   agent: kubernetes
   context: pull-kubernetes-e2e-win-1-11-fast
@@ -402,27 +402,27 @@ periodics:
       - "--timeout=600"
       - "--scenario=kubernetes_e2e"
       - "--" # end bootstrap args, scenario args below
-      - --build=bazel
-      - --deployment=acsengine
-      - --provider=azure
-      - --test=true
-      - --up=true
-      - --down=true
-      - --ginkgo-parallel=8
-      - --acsengine-admin-password=Passw0rdAdmin
-      - --acsengine-admin-username=azureuser
-      - --acsengine-resource-name=prow-${PROW_JOB_ID}
-      - --acsengine-resourcegroup-name=${JOB_NAME}-${PROW_JOB_ID}
-      - --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.1/acs-engine-v0.21.1-linux-amd64.tar.gz
-      - --acsengine-creds=$AZURE_CREDENTIALS
-      - --acsengine-agentpoolcount=4
-      - --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE
-      - --acsengine-winZipBuildScript=$WIN_BUILD
-      - --acsengine-location=westus2
-      - --acsengine-orchestratorRelease=1.11
-      - --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.2-1int.zip
-      - --acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.2
-      - --test_args="--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.default.medium.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.tmpfs.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].HostPath.should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]" \
+      - "--build=host-go"
+      - "--deployment=acsengine"
+      - "--provider=azure"
+      - "--test=true"
+      - "--up=true"
+      - "--down=true"
+      - "--ginkgo-parallel=8"
+      - "--acsengine-admin-password=Passw0rdAdmin"
+      - "--acsengine-admin-username=azureuser"
+      - "--acsengine-resource-name=prow-${PROW_JOB_ID}"
+      - "--acsengine-resourcegroup-name=${JOB_NAME}-${PROW_JOB_ID}"
+      - "--acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.1/acs-engine-v0.21.1-linux-amd64.tar.gz"
+      - "--acsengine-creds=$AZURE_CREDENTIALS"
+      - "--acsengine-agentpoolcount=4"
+      - "--acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE"
+      - "--acsengine-winZipBuildScript=$WIN_BUILD"
+      - "--acsengine-location=westus2"
+      - "--acsengine-orchestratorRelease=1.11"
+      - "--acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.2-1int.zip"
+      - "--acsengine-hyperkube-url=k8s-gcrio.azureedge.net/hyperkube-amd64:v1.11.2"
+      - "--test_args=--ginkgo.dryRun=false --ginkgo.noColor --ginkgo.flakeAttempts=3 --ginkgo.focus=\\[Conformance\\]|\\[NodeConformance\\] --ginkgo.skip=\\[Serial\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].ConfigMap.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Secrets.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.as.non-root.with.defaultMode.and.fsGroup.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.defaultMode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.and.Item.Mode.set.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.be.consumable.from.pods.in.volume.with.mappings.as.non-root.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Projected.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.DefaultMode.on.files.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].Downward.API.volume.should.set.mode.on.item.file.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(non-root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0644,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0666,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,default\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.should.support.\\(root,0777,tmpfs\\).\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.default.medium.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].EmptyDir.volumes.volume.on.tmpfs.should.have.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]|\\[sig-storage\\].HostPath.should.give.a.volume.the.correct.mode.\\[NodeConformance\\].\\[Conformance\\]"
       env:
       - name: DOCKER_IN_DOCKER_ENABLED
         value: "true"
