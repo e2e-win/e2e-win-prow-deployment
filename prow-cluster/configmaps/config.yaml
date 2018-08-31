@@ -368,7 +368,7 @@ postsubmits:
       preset-kube-config: "true"
     spec:
       containers:
-      - image: papagalu/update-config 
+      - image: gcr.io/win-e2e-test/update-config
 
 periodics:
 - interval: 24h
