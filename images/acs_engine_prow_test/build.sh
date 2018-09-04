@@ -166,6 +166,16 @@ ${KUBETEST} --deployment=acsengine --provider=azure --test=true --up=true --down
                 --dump=$ARTIFACTS_DIR
 set -e
 popd
-./check_tests.py "$ARTIFACTS_DIR/junit_runner.xml"
+#./check_tests.py "$ARTIFACTS_DIR/junit_runner.xml"
+
+if [ -f $ARTIFACTS_DIR/junit_runner.xml ]; then
+   echo "File $ARTIFACTS_DIR/junit_runner.xml exists."
+else
+   echo "File $ARTIFACTS_DIR/junit_runner.xml does not exist."
+fi
+
+echo "ls $ARTIFACTS_DIR"
+ls $ARTIFACTS_DIR
+
 
 copy_acs_engine_logs
