@@ -110,7 +110,7 @@ $BAZEL_OUTPUT --deployment=acsengine --provider=azure --test=false --up=true --d
               --acsengine-win-binaries-url=https://acs-mirror.azureedge.net/wink8s/v1.11.0-1int.zip \
               --acsengine-creds=$AZURE_CREDENTIALS --acsengine-public-key=$AZURE_SSH_PUBLIC_KEY_FILE \
               --acsengine-winZipBuildScript=$WIN_BUILD --acsengine-location=${LOCATION} \
-              --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.19.5/acs-engine-v0.19.5-linux-amd64.tar.gz
+              --acsengine-download-url=https://github.com/Azure/acs-engine/releases/download/v0.21.2/acs-engine-v0.21.2-linux-amd64.tar.gz
 
 popd
 
