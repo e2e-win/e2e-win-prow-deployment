@@ -5,6 +5,24 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+OUTPUT_DIR=$HOME/output
+mkdir ${OUTPUT_DIR}
+OUTPUT_FILE=${OUTPUT_DIR}/build-log.txt
+exec &> >(tee -a ${OUTPUT_FILE})
+
+GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
+GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
+
+gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+
+function upload_results {
+    # Uploading results
+    echo "Uploading results"
+    gsutil cp -r ${OUTPUT_DIR} ${GS_BUCKET_FULL_PATH}
+}
+
+trap upload_results EXIT
+
 function cleanup_binfmt_misc () {
     if [ ! -f /proc/sys/fs/binfmt_misc/status ]; then
         mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
@@ -91,7 +109,6 @@ function build_target () {
         local target="build"
     else
         local target="push"
-        gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
         gcloud auth configure-docker
     fi
 
