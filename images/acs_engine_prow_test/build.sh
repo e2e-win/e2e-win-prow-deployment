@@ -55,6 +55,7 @@ function upload_results {
     # Uploading results
     echo "Uploading results"
     gsutil cp -r ${OUTPUT_DIR} ${GS_BUCKET_FULL_PATH}
+    echo "Finished uploading results"
 
 }
 
