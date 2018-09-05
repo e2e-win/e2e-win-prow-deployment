@@ -37,7 +37,7 @@ presets:
     preset-azure-ssh: "true"
   env:
   - name: AZURE_SSH_PUBLIC_KEY_FILE
-    value: /etc/azure-ssh/azure-ssh-pub
+    value: /etc/azure-ssh/azure-ssh.pub
   - name: CLOUD_CONFIG
     value: random
   - name: AZ_STORAGE_CONTAINER_NAME
