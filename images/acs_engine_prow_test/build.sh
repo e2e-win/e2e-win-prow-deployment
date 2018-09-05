@@ -8,7 +8,7 @@ OUTPUT_DIR=$HOME/output
 ARTIFACTS_DIR=$OUTPUT_DIR/artifacts
 mkdir ${OUTPUT_DIR}
 mkdir ${ARTIFACTS_DIR}
-OUTPUT_FILE=${OUTPUT_DIR}/build-log.txt
+OUTPUT_FILE= $HOME/build-log.txt
 exec &> >(tee -a ${OUTPUT_FILE})
 
 AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}
@@ -54,8 +54,10 @@ function upload_results {
 
     # Uploading results
     echo "Uploading results"
-    gsutil cp -r ${OUTPUT_DIR} ${GS_BUCKET_FULL_PATH}
+    gsutil -m cp -r ${OUTPUT_DIR} ${GS_BUCKET_FULL_PATH}
     echo "Finished uploading results"
+    gsutil -m cp ${OUTPUT_FILE} ${GS_BUCKET_FULL_PATH}
+    
 
 }
 
