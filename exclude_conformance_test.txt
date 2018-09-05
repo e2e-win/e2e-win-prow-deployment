@@ -1,5 +1,7 @@
 [k8s.io] KubeletManagedEtcHosts  should test kubelet managed /etc/hosts file [NodeConformance] [Conformance]
 
+[k8s.io] PrivilegedPod [NodeConformance]  should enable privileged commands
+
 [sig-storage] ConfigMap  should be consumable from pods in volume as non-root [NodeConformance] [Conformance]
 [sig-storage] ConfigMap  should be consumable from pods in volume with defaultMode set [NodeConformance] [Conformance]
 [sig-storage] ConfigMap  should be consumable from pods in volume with mappings and Item mode set [NodeConformance] [Conformance]
