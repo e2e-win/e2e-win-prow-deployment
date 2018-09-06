@@ -41,3 +41,8 @@
 
 [sig-storage] HostPath  should give a volume the correct mode [NodeConformance] [Conformance]
 
+[sig-storage] Subpath Atomic writer volumes  should support subpaths with configmap pod with mountPath of existing file [Conformance]
+[sig-storage] Subpath Atomic writer volumes  should support subpaths with projected pod [Conformance]
+[sig-storage] Subpath Atomic writer volumes  should support subpaths with secret pod [Conformance]
+[sig-storage] Subpath Atomic writer volumes  should support subpaths with configmap pod [Conformance]
+[sig-storage] Subpath Atomic writer volumes  should support subpaths with downward pod [Conformance]
