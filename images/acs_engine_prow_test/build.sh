@@ -8,7 +8,7 @@ OUTPUT_DIR=$HOME/output
 ARTIFACTS_DIR=$OUTPUT_DIR/artifacts
 mkdir ${OUTPUT_DIR}
 mkdir ${ARTIFACTS_DIR}
-OUTPUT_FILE= $HOME/build-log.txt
+OUTPUT_FILE=$HOME/build-log.txt
 exec &> >(tee -a ${OUTPUT_FILE})
 
 AZ_RG_NAME=${JOB_NAME}-${PROW_JOB_ID}
