@@ -50,6 +50,7 @@ presets:
   - name: azure-ssh
     secret:
       secretName: azure-ssh
+      defaultMode: 256
   volumeMounts:
   - name: azure-ssh
     mountPath: /etc/azure-ssh
