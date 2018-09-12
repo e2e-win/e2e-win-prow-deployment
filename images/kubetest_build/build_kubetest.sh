@@ -10,6 +10,9 @@ OUTPUT_FILE="${OUTPUT_DIR}/build-log.txt"
 exec &> >(tee -a ${OUTPUT_FILE})
 
 GS_BUCKET=${GS_BUCKET:-"gs://e2e-win-acs-engine"}
+REPO_NAME=${REPO_NAME:-"e2e-win-prow-deployment"}
+REPO_OWNER=${REPO_OWNER:-"e2e-win"}
+
 GS_BUCKET_FULL_PATH=${GS_BUCKET}/${REPO_NAME}_${REPO_OWNER}/${PULL_NUMBER}/${JOB_NAME}/${PROW_JOB_ID}/${BUILD_NUMBER}
 
 PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
