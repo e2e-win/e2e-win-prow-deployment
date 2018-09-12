@@ -243,7 +243,7 @@ presubmits:
   - name: pull-acs-engine
     agent: kubernetes
     context: pull-acs-engine
-    always_run: true
+    always_run: false
     max_concurrency: 5
     rerun_command: "/test pull-acs-engine"
     trigger: "/test pull-acs-engine"
