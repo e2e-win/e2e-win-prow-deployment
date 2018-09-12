@@ -376,6 +376,7 @@ periodics:
   agent: kubernetes
   name: kubetest-build-job
   labels:
+    preset-service-account: "true"
     preset-azure-storage: "true"
   spec:
     containers:
