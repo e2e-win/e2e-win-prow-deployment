@@ -17,21 +17,6 @@
 [sig-storage] Downward API volume  should set DefaultMode on files [NodeConformance] [Conformance]
 [sig-storage] Downward API volume  should set mode on item file [NodeConformance] [Conformance]
 
-# expects 0644 file permissions instead of 0755
-# https://github.com/kubernetes/kubernetes/pull/71036
-[sig-storage] Secrets  should be consumable from pods in volume [NodeConformance] [Conformance]
-[sig-storage] Secrets  should be consumable from pods in volume with mappings [NodeConformance] [Conformance]
-[sig-storage] Secrets  should be consumable in multiple volumes in a pod [NodeConformance] [Conformance]
-[sig-storage] Projected secret  should be consumable from pods in volume [NodeConformance] [Conformance]
-[sig-storage] Projected secret  should be consumable from pods in volume with mappings [NodeConformance] [Conformance]
-[sig-storage] Projected secret  should be consumable in multiple volumes in a pod [NodeConformance] [Conformance]
-[sig-storage] Projected configMap  should be consumable from pods in volume [NodeConformance] [Conformance]
-[sig-storage] Projected configMap  should be consumable from pods in volume with mappings [NodeConformance] [Conformance]
-[sig-storage] ConfigMap  should be consumable from pods in volume [NodeConformance] [Conformance]
-[sig-storage] ConfigMap  should be consumable from pods in volume with mappings [NodeConformance] [Conformance]
-[sig-storage] Secrets  should be able to mount in a volume regardless of a different secret existing with same name in different namespace [NodeConformance] [Conformance]
-[sig-storage] Projected secret  should be able to mount in a volume regardless of a different secret existing with same name in different namespace [NodeConformance]
-
 # sets unsupported HostNetwork
 # https://github.com/kubernetes/kubernetes/pull/69525
 [sig-network] Networking Granular Checks: Pods  should function for intra-pod communication: http [NodeConformance] [Conformance]
@@ -96,11 +81,6 @@
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull from private registry without secret [NodeConformance]
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull image from invalid registry [NodeConformance]
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull non-existing image from gcr.io [NodeConformance]
-
-# uses hardcoded image names
-# https://github.com/kubernetes/kubernetes/pull/71256
-[sig-apps] ReplicaSet should adopt matching pods on creation and release no longer matching pods [Conformance]
-[sig-apps] ReplicationController should adopt matching pods on creation [Conformance]
 
 # DNS related
 [sig-network] DNS  should provide DNS for the cluster  [Conformance]
