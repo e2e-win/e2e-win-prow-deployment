@@ -1,3 +1,9 @@
+# CURRENT CONFORMANCE & NODECONFORMANCE COUNT:
+# TOTAL: 226 
+# SKIPPED: 65
+# SHOULD RUN: 161
+# 05.12.2018
+
 # sets RunAsUser / RunAsGroup and / or sets Item Mode on files
 # https://github.com/kubernetes/kubernetes/pull/69872
 [sig-storage] ConfigMap  should be consumable from pods in volume as non-root [NodeConformance] [Conformance]
