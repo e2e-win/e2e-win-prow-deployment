@@ -22,8 +22,8 @@
 [sig-storage] Projected secret  should be consumable from pods in volume with mappings and Item Mode set [NodeConformance] [Conformance]
 [sig-storage] Downward API volume  should set DefaultMode on files [NodeConformance] [Conformance]
 [sig-storage] Downward API volume  should set mode on item file [NodeConformance] [Conformance]
-[sig-storage] Projected Downward API volume  should set DefaultMode on files [NodeConformance] [Conformance]
-[sig-storage] Projected Downward API volume  should set mode on item file [NodeConformance] [Conformance]
+[sig-storage] Projected downwardAPI should set DefaultMode on files [NodeConformance] [Conformance]
+[sig-storage] Projected downwardAPI should set mode on item file [NodeConformance] [Conformance]
 
 
 # sets unsupported HostNetwork
