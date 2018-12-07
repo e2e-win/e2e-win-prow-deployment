@@ -1,7 +1,7 @@
 # CURRENT CONFORMANCE & NODECONFORMANCE COUNT:
 # TOTAL: 226 
-# SKIPPED: 65
-# SHOULD RUN: 161
+# SKIPPED: 67
+# SHOULD RUN: 159
 # 05.12.2018
 
 # sets RunAsUser / RunAsGroup and / or sets Item Mode on files
@@ -22,6 +22,9 @@
 [sig-storage] Projected secret  should be consumable from pods in volume with mappings and Item Mode set [NodeConformance] [Conformance]
 [sig-storage] Downward API volume  should set DefaultMode on files [NodeConformance] [Conformance]
 [sig-storage] Downward API volume  should set mode on item file [NodeConformance] [Conformance]
+[sig-storage] Projected Downward API volume  should set DefaultMode on files [NodeConformance] [Conformance]
+[sig-storage] Projected Downward API volume  should set mode on item file [NodeConformance] [Conformance]
+
 
 # sets unsupported HostNetwork
 # https://github.com/kubernetes/kubernetes/pull/69525
