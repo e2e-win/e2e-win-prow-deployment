@@ -2,7 +2,7 @@
   "apiVersion": "vlabs",
   "tags": {
     "myrandomtag": "testtag"
-  }
+  },
   "properties": {
     "orchestratorProfile": {
       "orchestratorType": "Kubernetes",
