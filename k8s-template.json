@@ -1,7 +1,7 @@
 {
   "apiVersion": "vlabs",
   "tags": {
-    "myrandomtag": "testtag"
+    "test-tag": "test"
   },
   "properties": {
     "orchestratorProfile": {
