@@ -1,6 +1,6 @@
 # CURRENT CONFORMANCE & NODECONFORMANCE COUNT:
 # TOTAL: 226 
-# SKIPPED: 67
+# SKIPPED: 64
 # SHOULD RUN: 159
 # 05.12.2018
 
@@ -63,10 +63,6 @@
 [sig-storage] EmptyDir volumes  volume on tmpfs should have the correct mode [NodeConformance] [Conformance]
 [sig-storage] HostPath  should give a volume the correct mode [NodeConformance] [Conformance]
 
-# sets PodSecurityContext (SELinuxOptions)
-# https://github.com/kubernetes/kubernetes/pull/70092
-[k8s.io] Container Runtime blackbox test when starting a container that exits  should run with the expected status [NodeConformance] [Conformance]
-
 # can't mount files in Windows Containers
 # https://github.com/kubernetes/kubernetes/pull/69872
 [k8s.io] KubeletManagedEtcHosts  should test kubelet managed /etc/hosts file [NodeConformance] [Conformance]
@@ -87,10 +83,15 @@
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should be able to pull from private registry with secret [NodeConformance]
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should be able to pull image from docker hub [NodeConformance]
 [k8s.io] Container Runtime blackbox test when running a container with a new image  should be able to pull image from gcr.io [NodeConformance]
-[k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull from private registry without secret [NodeConformance]
-[k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull image from invalid registry [NodeConformance]
-[k8s.io] Container Runtime blackbox test when running a container with a new image  should not be able to pull non-existing image from gcr.io [NodeConformance]
 
 # DNS related
+# https://github.com/kubernetes/kubernetes/pull/72729
+# https://github.com/kubernetes/kubernetes/pull/70156
 [sig-network] DNS  should provide DNS for the cluster  [Conformance]
+
+# https://github.com/kubernetes/kubernetes/pull/70156
 [sig-network] DNS  should provide DNS for services  [Conformance]
+
+# this test does not exist yet, but the following PR will add it.
+# https://github.com/kubernetes/kubernetes/pull/72729
+[sig-network] DNS  should provide /etc/hosts entries for the cluster  [Conformance]
