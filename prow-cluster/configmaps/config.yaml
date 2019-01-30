@@ -374,6 +374,16 @@ postsubmits:
 periodics:
 - interval: 24h
   agent: kubernetes
+  name: asc-engine-build-job
+  labels:
+    preset-azure-storage: "true"
+    preset-service-account: "true"
+  spec:
+    containers:
+    - image: gcr.io/win-e2e-test/build_acs_engine:latest
+
+- interval: 24h
+  agent: kubernetes
   name: kubetest-build-job
   labels:
     preset-azure-storage: "true"
