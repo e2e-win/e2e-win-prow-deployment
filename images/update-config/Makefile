@@ -1,4 +1,4 @@
-IMG = gcr.io/win-e2e-test/update-config
+IMG = e2eteam/update-config
 TAG = latest
 
 all: build

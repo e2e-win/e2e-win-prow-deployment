@@ -7,7 +7,7 @@ set -o pipefail
 
 function update_config () {
     local config="$1"
-    kubectl create configmap $config --from-file=${config}=${config}.yaml --dry-run -o yaml | kubectl replace configmap $config -f -
+    kubectl create configmap $config --from-file=${config}.yaml --dry-run -o yaml | kubectl replace configmap $config -f -
 }
 
 function validate () {
@@ -23,7 +23,6 @@ function main () {
     validate "/root/e2e-win-prow-deployment/prow-cluster/configmaps/config.yaml"
     pushd "e2e-win-prow-deployment/prow-cluster/configmaps"
         update_config "config"
-        update_config "plugins"
     popd
 }
 
