@@ -135,16 +135,6 @@ presets:
   - name: kube-conf
     mountPath: /root/.kube/
     readOnly: true
-- labels:
-    preset-kube-config: "true"
-  volumes:
-  - name: kube-conf
-    secret:
-      secretName: kube-conf
-  volumeMounts:
-  - name: kube-conf
-    mountPath: /root/.kube/
-    readOnly: true
 
 postsubmits:
   e2e-win/e2e-win-prow-deployment:
@@ -152,7 +142,6 @@ postsubmits:
     agent: kubernetes
     branches:
     - master
-    - papagalu-test
     labels:
       preset-kube-config: "true"
     spec:
