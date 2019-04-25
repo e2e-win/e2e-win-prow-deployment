@@ -65,7 +65,7 @@ trap "upload_results" EXIT
 
 
 REPO=${REPO:-"http://github.com/${REPO_OWNER}/${REPO_NAME}"}
-BRANCH=${BRANCH:-"master"}
+BRANCH=${PULL_BASE_REF:-${BRANCH:-"master"}}
 
 function prepare_repo {
 
